@@ -2,19 +2,21 @@ var fs = require('fs');
 var express = require('express');
 var request = require('request');
 var app = express();
-var wordArray = require('./words/3000-array.json').words;
-var Gaddag = require('./gaddag/gaddag.js').Gaddag;
-var log = require('./gaddag/util.js').log;
+var wordArray = require('../words/3000-array.json').words;
+var Gaddag = require('../gaddag/gaddag.js').Gaddag;
+var log = require('../gaddag/util.js').log;
 
-// TODO move this, make lazy, make optional
-_scp.gaddag = new Gaddag();
-_scp.gaddag.addAll(wordArray);
 
 console.log('Scrabble Bot, reporting for duty.');
 
 var _scp = this;
-_scp.ASTROCYTE = 'http://172.28.1.207';
-_scp.ASTROCYTE_PORT = '1337';
+
+// Temporary force data structure
+_scp.gaddag = new Gaddag();
+_scp.gaddag.addAll(wordArray);
+
+_scp.MPI = 'http://myelinprice.com';
+_scp.MPI_PORT = '1337';
 
 _scp.server=null,
 _scp.port=null;
@@ -27,8 +29,8 @@ _scp.thinking = false;
 _scp.cookieJar = null;
 
 _scp.configure = function(url, port, delay){
-    _scp.server = url || _scp.ASTROCYTE;
-    _scp.port = port || process.env.PORT || _scp.ASTROCYTE_PORT;
+    _scp.server = url || _scp.MPI;
+    _scp.port = port || process.env.PORT || _scp.MPI_PORT;
     _scp.delay = delay || 1500;
 }
 
