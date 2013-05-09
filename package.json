@@ -1,0 +1,45 @@
+{
+  "name": "html-scrabble",
+  "description": "Multi user Scrabble game",
+  "version": "0.1.2",
+  "author": {
+    "name": "Hans Hübner",
+    "email": "hans.huebner@gmail.com",
+    "url": "https://github.com/hanshuebner"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hanshuebner/html-scrabble.git"
+  },
+  "main": "server",
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "license": "MIT/X11",
+  "dependencies": {
+    "dirty": ">=0.9.6",
+    "express-negotiate": ">=0.0.5",
+    "express": ">=3.0.0rc2",
+    "nodemailer": ">=0.3.22",
+    "nodeunit": ">=0.7.4",
+    "optimist": ">=0.3.4",
+    "socket.io": ">=0.9.9",
+    "underscore": ">=1.3.3",
+    "icebox": "=0.1.1"
+  },
+  "devDependencies": {
+    "release-utils": ">= 0.0.1"
+  },
+  "scripts": {
+    "build-release": "node node_modules/release-utils/npm-release.js",
+    "start": "node server.js"
+  },
+  "readme": "# Online multiplayer Scrabble with HTML/JavaScript UI\n\n## History\n\nThis repository contains the code for a multiplayer Scrabble game.  I\nhave written it because my wife and I got increasingly frustrated by\nthe sluggish Web 1.0 interface that http://thepixiepit.co.uk/\nprovides.  Coming up with something better was on my To-Do-List for\nyears, but I never found enough time to get a decent board UI\nimplemented, and The Pixie Pit served us well enough through those\nyears.\n\nMuch to my pleasure, I stumbled over\nhttp://code.google.com/p/html-scrabble/ one day, which implemented the\ninteractive parts of a Scrabble board in a very nice manner.  The\nimplementation was lacking the game logic and server parts, though, so\nI decided to fork the project and add the missing pieces.\n\nLittle of the original board code is left now, but I owe the original\nauthor, Daniel Weck, lots of kudos for getting CSS and Drag&Drop under\ncontrol.  Without his work, I'd not be able to get the game to run.  I\nalso owe an apology for ripping his code apart and removing the\ndictionary functionality, as we are playing without a dictionary and\nwant to keep it that way.\n\n## Features\n\n* Two to four players\n* German, English and French letter sets\n* Written in JavaScript, runs in browser\n* Scalable user interface\n* Desktop notification support\n* Moderate sound effects\n* Tile placement by clicking, drag&drop or keyboard entry\n* Chat\n* Standard Scrabble rules including \"Challenge\" with simple penalty\n* No dictionary enforced\n* Player online status display\n* Participation in multiple games from one browser possible\n* Uses node.js on the server\n* No database required, no deployment complexities\n\n## Limitations\n\n* Human players only.  No computer players are available.\n* No dictionary.  Any word can be entered.\n* No security.  The server uses sufficiently long random numbers as keys for\n  games and players to make guessing a key impossible.  The game and player\n  keys are enough to join the game and make moves, though.\n* Limited browser support.  We're using Chrome and Firefox and I am not\n  testing on other browsers.\n* Unlicensed.  \"Scrabble\" is a registered trademark by Hasbro and Spear, and\n  the word is used in this program without permission.\n* Bugs.  There are some minor (and maybe even some major) bugs which I have\n  not come around to fix yet, and maybe never will.\n* Ugly code.  I did not understand much of the original code when I started\n  adding features, and did not refactor thoroughly in the course of action.\n  There are several things in the code that I'd do differently now, but as\n  the game works well enough as it is, I'm not doing it.  If you want to\n  hack this code, expect a high WTF rate.\n* Ugly UI.  Daniel's original work was very nice-looking, and my additions\n  to the user interface can't compete with what he did.\n* UI not translated.  The user interface is available in English, only.\n* Simple database.  All game data is kept in memory and serialized to a JSON\n  log using the node-dirty database system.  This works well, but has limited\n  capacity and the database file grows without bounds.\n\nAs I am not planning to provide the game as a public service, but rather\nrun it for me and my friends to use, these limitations do not bother me.\nIf you look at the game, please consider that it is a game meant to be\nplayed between friends, not an Internet service open to the general public.\n\n## Future changes\n\nI am open to patch submissions as long as the playability of the game\nis preserved.  In particular, we want no dictionary matching, fast\nnext game creation, no passwords, keyboard operability.  I also want\nzero-effort deployment (i.e. no mandatory dependency on a database\nserver).\n\nIt would be somewhat nice to grow the game into a public service, but\nthere is a lot of work left towards that goal, and I don't intend to\nmake such an effort given the uncertain licensing issues.  If you want\nto deal with the legal aspects, let me know.\n\n## Installing\n\nThe game uses node.js as server and depends on some npm packages.  It can\nitself be installed using npm:\n\n```\n$ npm install html-scrabble\n```\n\n## Configuration\n\nSettings can be be changed by the way of a configuration file which\nmust be named 'config.js' and placed in the main html-scrabble\ndirectory.  The default configuration file is included as\n[config-default.json](html-scrabble/blob/master/config-default.json). It\ncan be copied to config.js and then edited.\n\nBy default, the server starts on port 9093 and uses the smtp server\nrunning on the local host to send out game invitation emails.  The\ninvitation emails contain the \"localhost\" in the URL, so they will\nonly work for a browser running on the same machine as the server.\n\nAs a minimum, the ```baseUrl``` and ```mailSender``` configuration\nproperties should be changed.  Furthermore, if you are not running an\nSMTP server on your server, you need to set the\n```mailTransportConfig``` appropriately.  Please refer to [nodemailer\ndocumentation](http://documentup.com/andris9/nodemailer/#setting-up-a-transport-method)\nfor information on how to configure nodemailer.\n\n### Protecting the game list\n\nIf you deploy your Scrabble server in the Internet, you may want to\nprotect your game list so that pranksters can't mess up your games.\nYou can do so by adding a ```gameListLogin``` property to your\nconfiguration like so:\n\n```\n    \"gameListLogin\": {\n        \"username\": \"foo\",\n        \"password\": \"bar\"\n    }\n```\n\nNote that this is meant as a light protective measure.  Do not use a\npassword that you use elsewhere.  Thank you for observing all safety\nmeasures.\n\n## Running\n\nOnce you're satisfied with the configuration, you can start the game\nserver using\n\n```\n$ npm start html-scrabble\n```\n\nOpen your web browser on the configured game URL to create a new game.\n\nIf you have trouble getting the server to run, feel free to contact\nme.  Be aware, though, that you will need a machine to run the server\non (I'm using my Mac, but FreeBSD or Linux will work as well) and have\nsome command line knowledge.  I cannot help you if you don't know your\nway through the shell and development tools.\n\nEnjoy,\nHans (hans.huebner@gmail.com)\n",
+  "readmeFilename": "README.md",
+  "_id": "html-scrabble@0.1.2",
+  "dist": {
+    "shasum": "8d9dc4f8f50ad4b579bbc7afc10bc9d07fbd9b5c"
+  },
+  "_from": "html-scrabble@",
+  "_resolved": "https://registry.npmjs.org/html-scrabble/-/html-scrabble-0.1.2.tgz"
+}
