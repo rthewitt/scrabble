@@ -103,7 +103,13 @@ function Gaddag() {
 
                 // if we have reached the end of this subtree, add the word (+ last character) to output array
                 if (nodeVal === 0) {
-                    words.push(word + nodeCh);
+                    // BUGFIX FROM BLOG - RTH
+                    if(nodeCh != '' && rack.indexOf(nodeCh) === -1) {
+                        continue;
+                    }
+                    else {
+                        words.push(word + nodeCh);
+                    }
                 } else {
                     // if this is the character separating the prefix, change direction and continue recursing
                     if (nodeKey === separator) {

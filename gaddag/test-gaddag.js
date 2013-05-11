@@ -12,6 +12,7 @@ if (typeof browser === 'undefined') {
     gaddag.addAll(wordArray);
 
     log("JSON string: " + gaddag.getJson());
+    log("testing: DNA" + gaddag.findWordsWithRackAndHook(['D'],'N'));
     log("All words with U: " + gaddag.findWordsWithHook('U').join(', '));
     log("All words with E: " + gaddag.findWordsWithHook('E').join(', '));
     log("All words with D: " + gaddag.findWordsWithHook('D').join(', '));

@@ -2,7 +2,7 @@ var fs = require('fs');
 var express = require('express');
 var request = require('request');
 var app = express();
-var wordArray = require('../words/3000-array.json').words;
+var wordArray = require('../words/20000-random-array.json').words;
 var Gaddag = require('../gaddag/gaddag.js').Gaddag;
 var log = require('../gaddag/util.js').log;
 
@@ -34,6 +34,9 @@ _scp.configure = function(url, port, delay){
     _scp.delay = delay || 1500;
 }
 
+_scp.BOARD_LENGTH = 15;
+_scp.DIRECTIONS = ['RIGHT','DOWN'];
+
 var stupid = function(state) {
     var loc = {x:7, y:7};
     var found = false;
@@ -49,7 +52,9 @@ var stupid = function(state) {
     console.log('player '+state.players[_scp.PLAYER_ID].name);
     var pSet = state.players[_scp.PLAYER_ID].rack.squares;
     for(piece in pSet) {
-        if(pSet[piece].type !== "Normal") continue; // TODO handle blank tiles
+        if(pSet[piece].type !== "Normal") continue; // TODO set this differently on server?
+        if(pSet[piece].tile.letter === ' ') // blank
+            pSet.splice(piece, 1); // Durrrrrr
         else {
             pieceToPlay = pSet[piece];
             break;
@@ -123,6 +128,27 @@ _scp.makeMove = function(){
     });
 }
 
+// TODO combine these methods using command name and args
+_scp.pass = function(){
+    var data = {command: "pass", api: true};
+
+    console.log('sending: '+JSON.stringify(data));
+    request({
+        method: 'PUT',
+        uri: _scp.server+':'+_scp.port+'/game/'+_scp.gameId,
+        json: true,
+        jar: _scp.cookieJar,
+        body: data
+    }, function(error, response, body){
+        if(response.statusCode == 200) {
+            console.log("Failure is unacceptable...");
+            console.log(body)
+        } else {
+            console.error("Apparently not an option.");
+        }
+    });
+}
+
 _scp.play = function() {
     if(!_scp.gameId || !_scp.userId) {
         throw "You want me to play with myself?";
@@ -137,9 +163,10 @@ _scp.play = function() {
                 var state = JSON.parse(body);
                 if(state.whosTurn == _scp.PLAYER_ID){
                     _scp.thinking = true;
+                    _scp.me = state.players[_scp.PLAYER_ID];
                     if(_scp.hook && typeof _scp.hook == 'function')
-                        _scp.hook();
-                    _scp.strategy(state); 
+                        _scp.hook.call(_scp);
+                    _scp.strategy.call(_scp, state); 
                     _scp.thinking = false;
                 }
                 setTimeout(function(){ return pollForChanges()},_scp.delay);
