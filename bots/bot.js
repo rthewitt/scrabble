@@ -1,7 +1,6 @@
 var fs = require('fs');
 var express = require('express');
 var request = require('request');
-var app = express();
 var wordArray = require('../words/20000-random-array.json').words;
 var Gaddag = require('../gaddag/gaddag.js').Gaddag;
 var log = require('../gaddag/util.js').log;
@@ -23,6 +22,7 @@ _scp.port=null;
 
 _scp.gameId = null;
 _scp.userId = null;
+_scp.userName = null;
 _scp.PLAYER_ID = 1;  
 _scp.thinking = false;
 
@@ -30,7 +30,8 @@ _scp.cookieJar = null;
 
 _scp.configure = function(url, port, delay){
     _scp.server = url || _scp.MPI;
-    _scp.port = port || process.env.PORT || _scp.MPI_PORT;
+    //_scp.port = port || process.env.PORT || _scp.MPI_PORT; 
+    _scp.port = port || _scp.MPI_PORT; // Currently loading from website, not locally
     _scp.delay = delay || 1500;
 }
 
@@ -80,6 +81,8 @@ _scp.connect = function(user){
         throw "I ain't been configured yet!";
 
     if(!user) throw "Gotta tell me who you are boss";
+
+    _scp.userName = user;
 
     request({ json: true, uri: _scp.server+':'+_scp.port+'/login/'+user+'/bot'}, 
         function(err, res, data){
@@ -193,4 +196,26 @@ _scp.play = function() {
     pollForChanges();
 }
 
-//module.exports = _scp;
+var app = express();
+var server = app.listen(process.env.PORT)
+
+// Revisit
+app.configure(function() {
+    app.use(express.methodOverride());
+    app.use(express.bodyParser());
+    app.use(express.cookieParser()); // necessary?
+    app.use(express.static(__dirname + '/html'));
+    app.use(express.errorHandler({
+        dumpExceptions: true, 
+        showStack: true
+    }));
+    app.use(app.router);
+});
+
+app.get("/", function(req, res) {
+    console.log("What is happening");
+    if(!(_scp.server && _scp.port))
+        throw "Bot not yet configured"; // Just use a page
+    res.redirect(_scp.server+":"+_scp.port+"/login/"+_scp.userName);
+});
+

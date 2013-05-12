@@ -21,7 +21,7 @@ var scoreComp = function(w1, w2) {
 // Currently we cannot handle word bridging
 scrabby.hasWordCollisions = function(board, square, iter) {
     console.log("Checking boundaries..." + 
-        (iter.isPivotAtWordBoundary ? "Edge Case"+(iter.first ? "first" : "last") : "");
+        (iter.isPivotAtWordBoundary ? "Edge Case"+(iter.first ? "first" : "last") : ""));
 
     function cSafe(check) {
         console.log('SUPEREXTRA '+!!check);
