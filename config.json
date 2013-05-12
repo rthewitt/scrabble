@@ -1,8 +1,9 @@
 {
-    "port": 9093,
-    "baseUrl": "http://localhost:9093/",
+    "port": 1337,
+    "baseUrl": "http://myelinprice/",
     "mailSender": "Scrabble Server <scrabble@netzhansa.com>",
     "mailTransportConfig": {
-        "hostname": "localhost"
-    }
+        "hostname": "myelinprice"
+    },
+    "aima" : ["peter","ethan","ryan","michael","martin"]
 }
